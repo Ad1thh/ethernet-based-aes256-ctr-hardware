@@ -91,6 +91,8 @@ Counter (Ctr_i) ---------> [ AES-256 Enc ]
 
 The custom IP core (`aes256_ctr_top`) is designed in synthesizable Verilog-2001. It contains three main blocks: the register bank (AXI4-Lite), the streaming bus wrapper (AXI4-Stream), and the pipelined encryption core.
 
+![Vivado Block Design Diagram](../Diagram%20-%20Block%20Design.png)
+
 ```
 +--------------------------------------------------------------------------------+
 | aes256_ctr_top IP Core                                                         |
@@ -128,7 +130,26 @@ To support a high-speed data stream, each of the 14 rounds is registered.
 - **Stage 14:** Final round (MixColumns bypassed) followed by output registers.
 The pipeline accepts a new 128-bit input on every clock cycle. The pipeline latency is exactly 15 clock cycles.
 
-### 3.2 Counter Core & Alignment Delay Line (`aes256_ctr_core.v`)
+### 3.2 Address Space Mapping & Vivado Editor
+The custom AES IP register space is mapped in the Zynq GP0 AXI Master address space:
+
+![Vivado Address Editor Map](../Address%20Editor.png)
+
+### 3.3 Physical Placement & Reports
+The synthesized and placed design is mapped onto the physical layout of the Zynq FPGA die:
+
+![FPGA Die Physical Placement Layout](../Implemented%20Design%20In%20FPGA.png)
+
+#### Resource Utilization Summary:
+![Vivado Resource Utilization Report](../Utilization.png)
+
+#### Timing Closure Summary:
+![Vivado Timing Report](../Timing%20Rpt.png)
+
+#### On-Chip Power Summary:
+![Vivado Power Analysis Report](../Power%20Rpt.png)
+
+### 3.4 Counter Core & Alignment Delay Line (`aes256_ctr_core.v`)
 Because the AES pipeline has a latency of 15 clock cycles, the counter value ($\text{Ctr}_k$) fed at Cycle $T_0$ emerges as keystream ($\text{KS}_k$) at Cycle $T_{15}$. To align the plaintext/ciphertext block ($\text{P}_k$) with its corresponding keystream block, the core implements a **15-stage parallel shift register delay line** for the data bus.
 - When `in_valid` is asserted, a counter is loaded into the pipeline, and the input data is loaded into `data_delay[0]`.
 - As the counter propagates down the AES pipeline, the data block shifts down the `data_delay` array.
@@ -187,6 +208,9 @@ The stack is configured in **RAW Mode** (no operating system overhead) for maxim
 - The application opens a TCP connection on port `7` (Echo Port).
 - It registers three primary callbacks: `accept_callback`, `recv_callback`, and `send_callback`.
 
+#### Vitis Serial Monitor Debug Output:
+![Vitis Serial Monitor Output Log](../Vitis%20-%20Serial%20Monitor.png)
+
 ### 4.2 AXI DMA Driver and Cache Coherency
 The AXI DMA is configured in **Simple (Direct) Mode** to avoid scatter-gather descriptors overhead. It runs in polled mode for deterministic latency measurement:
 1. When a complete file block is received in DDR memory:
@@ -234,18 +258,24 @@ For a 256 KB file ($262,144$ bytes):
 
 ---
 
-## 6. Verification and Test Results
+### 6.1 Network Connectivity (Ping Test)
+Initial connectivity is confirmed with standard network pings to the gateway:
 
-### 6.1 Behavioral Simulation Waveform Verification
-The testbench `tb_aes256_ctr_ip.v` was simulated in Vivado Simulator to verify timing.
-1. **Register Writes:** S_AXI transactions correctly write the 256-bit Key and 128-bit IV, and pulse the start bit.
-2. **Handshake & Serialization:** 32-bit `S_AXIS_TDATA` inputs are collected. When four words are ready, they are shifted into the pipeline.
-3. **Pipeline Delay:** The output `M_AXIS_TVALID` asserts exactly 15 clock cycles after the first block completes assembly.
-4. **Decryption Check:** Feeding the generated ciphertext back with the same counter state returns the original plaintext.
-5. **Zeroization Pulse:** When `panic_button` is asserted, all key registers in `aes256_ctr_top` go to `0` instantly.
+![Network Ping Test CMD Window](../Ping%20-%20CMD.png)
 
-### 6.2 Host-to-Board TCP/IP Test Run
-Executing the client script `aes256_client.py` on a PC connected to the Zynq board produces the following terminal output:
+### 6.2 Cryptographic Transaction Verification
+A plaintext text file and binary image payloads (such as `lena_gray.bmp`) were run through the gateway client to verify encryption and decryption functionality:
+
+*   **Original File before Encryption:**
+    ![Original Text File Content](../Text%20File%20before%20Encryption.png)
+*   **Encryption Command and Output Logs:**
+    ![Encryption Terminal Execution](../Encryption%20-%20CMD.png)
+*   **Resulting Ciphertext Output (Encrypted File):**
+    ![Encrypted File Hex View](../Encrypted%20File.png)
+*   **Decryption Command and Output Logs:**
+    ![Decryption Terminal Execution](../Decryption%20-%20CMD.png)
+*   **Restored Plaintext Output (Decrypted File):**
+    ![Decrypted Restored File Content](../Decrypted%20File.png)
 
 ```
 ====================================================

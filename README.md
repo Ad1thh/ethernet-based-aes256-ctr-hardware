@@ -37,6 +37,8 @@ The Processing System (PS) and Programmable Logic (PL) components communicate us
 1.  **AXI4-Lite (Control Path):** Used to load the 256-bit key and 128-bit IV, check status registers, and trigger processing.
 2.  **AXI4-Stream (Data Path):** Streams data packets between the AXI DMA core and the AES IP core at 100 MHz.
 
+![Vivado Block Design Diagram](Diagram%20-%20Block%20Design.png)
+
 ---
 
 ## Getting Started
@@ -58,6 +60,8 @@ Verify the link by pinging the board:
 ping 192.168.1.10
 ```
 
+![Network Ping Test](Ping%20-%20CMD.png)
+
 ### 3. Running the Host Utility
 Make sure Python 3 is installed, then run the utility tool:
 
@@ -73,8 +77,13 @@ Make sure Python 3 is installed, then run the utility tool:
     ```
     *Creates encrypted files and key parameter `.txt` metadata files in `C:\Users\hp\Downloads\outputs\encrypted`.*
 
+    ![Encryption CMD Output](Encryption%20-%20CMD.png)
+
 *   **Bulk Folder Decryption:**
     ```powershell
     python host/aes256_tool.py "C:\Users\hp\Downloads\outputs\encrypted" -m decrypt
     ```
     *Decrypts files using stored metadata and outputs restored files to `C:\Users\hp\Downloads\outputs\decrypted`.*
+
+    ![Decryption CMD Output](Decryption%20-%20CMD.png)
+
