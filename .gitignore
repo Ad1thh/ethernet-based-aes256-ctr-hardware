@@ -1,0 +1,48 @@
+# Vivado Project Temporary and Run Files
+.Xil/
+**/*.runs/
+**/*.cache/
+**/*.hw/
+**/*.sim/
+**/*.gen/
+**/*.ip_user_files/
+**/vivado*.jou
+**/vivado*.log
+**/xelab.log
+**/xelab.pb
+**/xsim.jou
+**/xsim.log
+**/xvlog.log
+**/xvlog.pb
+xsim.dir/
+**/*backup.jou
+**/*backup.log
+**/xsim_*.jou
+**/xsim_*.log
+~$*.docx
+~$*.doc
+
+
+# Vitis Workspace / Compiler Generated Files
+**/build/
+**/export/
+**/*.o
+**/*.d
+**/.wsdata/
+**/_ide/logs/
+**/.vitisWorkspace.json
+**/app_component/build/
+**/app_component/bin/
+**/app_component/obj/
+**/app_component/CMakeCache.txt
+**/app_component/CMakeFiles/
+**/app_component/cmake_install.cmake
+
+# Operating System & Python Files
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Scratch directory (temporary run files)
+scratch/
