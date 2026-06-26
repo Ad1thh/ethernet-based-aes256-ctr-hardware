@@ -1,4 +1,4 @@
-# Zynq-7000 Hardware AES-256 CTR Ethernet Gateway
+# Zynq-7000 Hardware AES-256 CTR Ethernet  Gateway
 
 This repository contains the design, implementation, and verification files for the **Zynq-7000 Hardware AES-256 CTR Ethernet Gateway**, developed as part of the **ASIC & FPGA SoC Design Internship** at the **Department of Electronics, CUSAT**.
 
